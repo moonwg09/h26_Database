@@ -1,0 +1,589 @@
+문제 7. 릴레이션 R(A,B,C),  S(C,D,E)가 주어졌을 때 다음 관계대수를  같은 의미를 갖는 
+SQL문으로 변환하시오
+
+create table R (
+    A     VARCHAR2(20) primary key,
+    B 	   VARCHAR2(20),
+    C     VARCHAR2(20) 
+);
+
+create table S (
+    C     VARCHAR2(20),
+    D 	   VARCHAR2(20),
+    E     VARCHAR2(20)
+);
+
+INSERT INTO R VALUES ('a1','b1','c1');
+INSERT INTO R VALUES ('a2','b1','c1');
+INSERT INTO R VALUES ('a3','b1','c2');
+INSERT INTO R VALUES ('a4','b2','c4');
+
+INSERT INTO S VALUES ('c1','d2','e1');
+INSERT INTO S VALUES ('c1','d1','e2');
+INSERT INTO S VALUES ('c2','d3','e3');
+INSERT INTO S VALUES ('c5','d3','e3');
+
+(1) σA=a2(R) 
+
+select  *
+from R
+where A = 'a2';
+
+(2) πA,B(R)
+
+select A, B
+from R;
+
+(3)R⋈R.c=S.c S
+
+select *
+from R r
+join S s on R.c = S.c
+
+문제 8
+다음 릴레이션 R(A, B, C)와 S(C,D,E)가 주어졌을 때 다음 결과가 도출되도록 sql문을 작성하
+시오
+
+(1)SELECT * FROM R INNER JOIN S ON (R.c=S.c);
+(2)SELECT * FROM R LEFT OUTER JOIN S ON (R.c=S.c);
+(3)SELECT * FROM R RIGHT OUTER JOIN S ON (R.c=S.c);
+(4)SELECT * FROM R FULL OUTER JOIN S ON (R.c=S.c);
+(5)SELECT * FROM R CROSS JOIN S ;
+
+
+문제 9. UNION 설명(UNION과 UNION ALL)
+create table R1 (
+    A     int primary key,
+    B 	   VARCHAR2(20)
+);
+
+create table R2 (
+    A     int ,
+    B 	   VARCHAR2(20)
+);
+
+create table R3 (
+    A     int ,
+    B 	   VARCHAR2(20)
+);
+
+INSERT INTO R1 VALUES (1,'a');
+INSERT INTO R1 VALUES (2,'b');
+INSERT INTO R1 VALUES (3,'c');
+INSERT INTO R2 VALUES (2,'b');
+INSERT INTO R2 VALUES (4,'d');
+INSERT INTO R3 VALUES (3,'c');
+INSERT INTO R3 VALUES (5,'e');
+INSERT INTO R3 VALUES (1,'a');
+
+문제 10. EXISTS와 NOT EXISTS 예제
+
+select *
+from customer c
+where exists(
+select 1
+from orders o
+where  o.custid = c.custid
+);
+
+문제 17
+
+CREATE TABLE Cust_addr (
+    custid     INT,
+    addrid     INT,
+    address    VARCHAR2(30),
+    phone      VARCHAR2(30),
+    changedate DATE,
+    CONSTRAINT pk_cust_addr PRIMARY KEY (custid, addrid), 
+    CONSTRAINT fk_customer FOREIGN KEY (custid) REFERENCES Customer(custid)
+);
+
+INSERT INTO Book VALUES(11, '데이터베이스 개론', '한빛미디어', 20000);
+INSERT INTO Book VALUES(12, '자바의 정석', '길벗', 32000);
+INSERT INTO Book VALUES(13, '파이썬 머신러닝', '위키북스', 25000);
+INSERT INTO Book VALUES(14, '운영체제 관리', '한빛미디어', 30000);
+INSERT INTO Book VALUES(15, '알고리즘 문제 풀기', '길벗', 22000);
+INSERT INTO Book VALUES(16, '클린 코드', '인사이트', 33000);
+INSERT INTO Book VALUES(17, 'SQL 첫걸음', '한빛미디어', 24000);
+
+INSERT INTO Customer VALUES (6, '박지수', '서울 마포구 합정동', '010-1234-5678');
+INSERT INTO Customer VALUES (7, '김도윤', '경기 성남시 분당구', '010-2345-6789');
+INSERT INTO Customer VALUES (8, '이서연', '서울 강남구 역삼동', '010-3456-7890');
+INSERT INTO Customer VALUES (9, '최민준', '인천 부평구 부평동', '010-4567-8901');
+INSERT INTO Customer VALUES (10, '정하은', '서울 송파구 잠실동', '010-5678-9012');
+
+INSERT INTO Cust_addr VALUES (6, 6, '서울 은평구 불광동','010-1234-5678' ,TO_DATE('2024-03-10','yyyy-mm-dd'));
+INSERT INTO Cust_addr VALUES (6, 7, '서울 마포구 합정동','010-1234-5678' ,TO_DATE('2025-07-20','yyyy-mm-dd'));
+INSERT INTO Cust_addr VALUES (7, 6, '경기 수원시 팔달구','010-2345-6789' ,TO_DATE('2023-11-05','yyyy-mm-dd'));
+INSERT INTO Cust_addr VALUES (7, 7, '경기 성남시 분당구','010-9999-0000' ,TO_DATE('2025-02-14','yyyy-mm-dd'));
+INSERT INTO Cust_addr VALUES (8, 6, '서울 강남구 역삼동','010-3456-7890' ,TO_DATE('2025-05-01','yyyy-mm-dd'));
+INSERT INTO Cust_addr VALUES (9, 6, '부산 해운대구 우동','010-4567-8901' ,TO_DATE('2024-08-22','yyyy-mm-dd'));
+
+
+
+
+
+(1)고객번호 1번의 주소 변경 내역을 모두 조회하시오
+select *
+from cust_addr ca
+join customer c on c.custid=ca.custid
+where c.custid = 6; 
+
+(2)고객번호 1번의 전화번호 변경 내역을 모두 조회하시오
+select ca.phone
+from cust_addr ca
+join customer c on c.custid = ca.custid
+where c.custid = 6;
+
+
+(3)고객번호 1번의 가입 당시 전화번호를 조회하시오
+select c.phone
+from customer c
+where c.custid = 6;
+
+(4)고객번호 1번의 “2025년 01월 01” 당시 전화번호를 보이시오. 주소 이력 중 
+changedate 속성값이 “2025년 01”보다 오래된 첫 번째 값을 찾는다
+
+select phone
+from (
+    select phone
+    from cust_addr
+    where custid = 6
+      and changedate < to_date('2025-01-01', 'YYYY-MM-DD')
+    order by changedate desc
+)
+where rownum = 1;
+
+문제 18
+
+CREATE TABLE Cart (
+    cartid     INT primary key,
+    custid     INT,
+    bookid    int,
+    cartdate DATE,
+    CONSTRAINT fk_book FOREIGN KEY (bookid) REFERENCES book(bookid),
+    CONSTRAINT fk_customer1 FOREIGN KEY (custid) REFERENCES Customer(custid)
+);
+
+INSERT INTO Cart VALUES (1,1,1, TO_DATE('2025/01/05', 'YYYY/MM/DD'));
+INSERT INTO Cart VALUES (2,1,3, TO_DATE('2025/01/10', 'YYYY/MM/DD'));
+INSERT INTO Cart VALUES (3,2,2, TO_DATE('2025/02/03', 'YYYY/MM/DD'));
+INSERT INTO Cart VALUES (4,2,5, TO_DATE('2025/02/15', 'YYYY/MM/DD'));
+INSERT INTO Cart VALUES (5,3,4, TO_DATE('2025/03/07', 'YYYY/MM/DD'));
+INSERT INTO Cart VALUES (6,3,7, TO_DATE('2025/03/20', 'YYYY/MM/DD'));
+INSERT INTO Cart VALUES (7,4,6, TO_DATE('2025/04/01', 'YYYY/MM/DD'));
+INSERT INTO Cart VALUES (8,4,1, TO_DATE('2025/04/18', 'YYYY/MM/DD'));
+INSERT INTO Cart VALUES (9,5,3, TO_DATE('2025/05/09', 'YYYY/MM/DD'));
+INSERT INTO Cart VALUES (10,5,7, TO_DATE('2025/05/22', 'YYYY/MM/DD'));
+
+(1)고객번호 1번의 cart에 저장된 도서 중 이미 주문한 도서를 구하시오
+
+select bookid 
+from cart
+where custid = 1 and bookid in (select bookid from orders where custid = 1);
+
+
+(2)고객번호 1번의  cart에 저장된 도서 중 아직 주문하지 않은 도서를 구사시오
+select bookid
+from cart
+where custid = 1 and bookid not in(select bookid from orders where custid = 1);
+
+
+(3)고객번호 1번의 cart에 저장된 도서들의 정가 합계를 구하시오.
+
+select sum(price)
+from cart c
+join book b on c.bookid = b.bookid
+where c.custid = 1 and c.bookid in (select c.bookid from orders where c.custid = 1);
+
+
+문제 19. Emp, Dept테이블로 구성된 회사사원 데이터베이스를 만들고자 한다. 테이블을 
+생성하고 데이터를 입력하는 SQL질의를 작성하시오
+
+
+
+(3 )부서에 관한 다음 네 개의 데이터를 삽입하시오. 
+
+INSERT INTO dept VALUES (10,'ACCOUNTING', 'NEW YORK');
+INSERT INTO dept VALUES (20,'RESEARCH', 'DALLAS');
+INSERT INTO dept VALUES (30,'SALES', 'CHICAGO');
+INSERT INTO dept VALUES (40,'OPERATION', 'BOSTON');
+
+(4사원에 관한 다음 네 개의 데이터를 삽입하시오
+
+INSERT INTO emp VALUES (7369,'SMITH', 'CLERK',7902,to_date('1980-12-17', 'yyyy-mm-dd'),800,null,20);
+INSERT INTO emp VALUES (7499,'ALLEN', 'SALESMAN',7698,to_date('1981-02-20', 'yyyy-mm-dd'),1600,300,30);
+INSERT INTO emp VALUES (7521,'WARD', 'SALESMAN',7698,to_date('1981-02-22', 'yyyy-mm-dd'),1250,500,30);
+INSERT INTO emp VALUES (7566,'JONES', 'MANAGER',7839,to_date('1981-04-02', 'yyyy-mm-dd'),2975,null,20);
+
+(5 )사원 테이블에 다음 데이터를 삽입하려고 하니 오류가 발생하였다. 오류 메시지를 확
+인해 보고 원인을 찾아보시오
+
+INSERT INTO Emp (empno,ename, job,mgr, hiredate,sal,comm,deptno ) values 
+(7654,‘MARTIN’, ‘SALESMAN’,7698, ‘1981-09-2800:00:00’, 1250,1400,50);
+
+INSERT INTO Emp (empno,ename, job,mgr, hiredate,sal,comm,deptno) values 
+(7654,'MARTIN','SALESMAN',7698, to_date('1981-09-28', 'yyyy-mm-dd'), 1250,1400,50);
+
+(6)각 사원의 사원이름(ename)과 소속 부서이름(dname), 부서위치(loc)를 함께 조회하시오
+
+select distinct e.ename, d.dname, d.loc
+from emp e
+join dept d on e.deptno = d.deptno; 
+
+(7)부서가 배정된 사원의 사원번호(empno), 사원이름(ename), 부서이름(dname)을 조회하
+시오. 부서가 없는 사원은 제외한다.
+
+select distinct e.empno, e.ename, d.dname
+from emp e
+join dept d on e.deptno = d.deptno
+where e.deptno = d.deptno;
+
+
+(8)부서 위치(loc)가 'DALLAS'인 부서에 소속된 모든 사원의 이름(ename), 업무(job), 월
+급여(sal)를 조회하시오.
+
+select distinct e.ename, e.job, e.sal
+from emp e
+join dept d on e.deptno = d.deptno
+where d.loc in (
+select loc
+from dept
+where loc = 'DALLAS'
+);
+
+(9)부서 위치(loc)가 'DALLAS'인 부서에 소속된 사원의 이름(ename), 업무(job)를 조회하
+시오. 서브쿼리를 사용할 것
+
+select distinct e.ename, e.job
+from emp e
+join dept d on e.deptno = d.deptno
+where d.loc in (
+select loc
+from dept
+where loc = 'DALLAS'
+);
+
+
+(10)전체 사원의 평균 급여(AVG(sal))보다 급여가 높은 사원의 이름(ename)과 급여(sal)를 
+조회하시오.
+
+select distinct ename, sal
+from emp
+where sal > (
+select avg(sal)
+from emp
+);
+
+(11)각 사원의 이름(ename)과 그 사원의 직속상사 이름을 함께 조회하시오. 상사가 없는 
+사원도 포함할 것
+
+select e1.ename , e2.ename
+from emp e1
+left join emp e2 on e1.mgr = e2.empno;
+
+
+(12)각 부서에서 급여가 가장 높은 사원의 이름(ename), 급여(sal), 부서이름(dname)을 조
+회하시오. 조인과 서브쿼리를 함께 사용할 것.
+
+select max(e.sal) , d.dname
+from dept d
+join emp e on d.deptno = e.deptno
+group by d.dname;
+
+
+select e.ename, e.sal, d.dname
+from emp e
+join dept d on d.deptno = e.deptno
+join (
+select deptno, max(sal) as max_sal
+from emp
+group by deptno
+) m on e.deptno = m.deptno and e.sal = m.max_sal;
+
+
+
+(13)부서 테이블의 구조를 변경하여 부서장의 이름을 저장하는 manager속성을 추가하고
+자 한다. ALTER 문을 사용하여 작성해 보시오. managername 속성이 만들어졌으면 
+UPDATE문을 이용하여  MANAGER의 이름을 입력하시오
+
+alter table dept 
+add managername varchar2(20);
+
+update dept 
+set managername = '김철수' 
+where deptno = 10;
+
+문제 20
+
+단순질의
+①모든 극장의 이름과 위치를 보이시오
+select 극장이름, 위치
+from 극장;
+
+②‘잠실’에 있는 극장을 보이시오
+select *
+from 극장
+where 위치 = '잠실';
+
+③‘잠실’에 사는 고객의 이름을 오름차순으로 보이시오
+select 이름
+from 고객
+where 주소 = '잠실'
+order by 이름 asc;
+
+④가격이 8,000원 이하인 영화의 극장번호,영화제목을 보이시오
+select 극장번호, 영화제목
+from 상영관
+where 가격 <= 8000;
+
+
+⑤극장 위치와 고객의 주소가 같은 고객을 보이시오
+select *
+from 고객 g
+join 극장 k on g.주소 = k.위치
+where k.위치 = g.주소;
+
+(2)집계질의
+①극장의 수는 몇 개인가?
+select count(극장번호)
+from 극장;
+
+②상영되는 영화의 평균 가격은 얼마인가?
+select avg(가격)
+from 상영관;
+
+③2025년 9월 1일에 영화를 관람한 고객의 수는 얼마인가?
+
+select count(고객번호)
+from 예약
+where 날짜 = '2025-09-01';
+
+(3)부속질의와 조인
+
+①‘대한’극장에서 상영된 영화 제목을 보이시오
+select 상영관.영화제목
+from 상영관
+join 극장 on 극장.극장번호 = 상영관.극장번호
+where 극장.극장이름 = '대한';
+
+②‘대한’극장에서 영화를 본 고객의 이름을 보이시오
+select 고객.이름
+from 고객
+join 극장 on 고객.주소 = 극장.위치
+where 극장.극장이름 = '대한';
+
+③‘대한 극장의 전체 수입을 보이시오
+select sum(가격)
+from 상영관
+join 극장 on 극장.극장번호 = 상영관.극장번호
+where 극장.극장이름 = '대한'
+group by 가격;
+
+(4)그룹질의
+
+①극장별 상영관 수를 보이시오
+select count(상영관번호)
+from 상영관
+join 극장 on 극장.극장번호 = 상영관.극장번호
+group by 상영관번호;
+
+
+②‘잠실’에 있는 극장의 상영관을 보이시오
+select *
+from 상영관
+join 극장 on 극장.극장번호 = 상영관.극장번호
+where 극장.위치 = '잠실';
+
+
+③2025년 9월 1일의 극장별 평균 관람 고객 수를 보이시오
+select 극장번호, avg(고객수) as "평균 관람 고객 수"
+from (
+    select 극장번호, 날짜, count(고객번호) as 고객수
+    from 예약
+    where 날짜 = to_date('2025-09-01', 'YYYY-MM-DD')
+    group by 극장번호, 날짜
+)
+group by 극장번호;
+
+
+④2025년 9월 1일에 가장 많은 고객이 관람한 영화를 보이시오
+select s.영화제목
+from 상영관 s
+join 예약 r on s.극장번호 = r.극장번호 and s.상영관번호 = r.상영관번호
+where r.날짜 = to_date('2025-09-01', 'yyyy-mm-dd')
+group by s.영화제목
+having count(r.고객번호) = (
+	select max(count(r2.고객번호))
+	from 예약 r2
+	join 상영관 s2 on r2.극장번호 = s2.극장번호 and r2.상영관번호 = s2.상영관번호
+	where r2.날짜 = to_date('2025-09-01', 'yyyy-mm-dd')
+	group by s2.영화제목
+);
+
+(5)DML
+①각 테이블에 데이터를 삽입하는 INSERTans을 하나씩 실행시켜 보시오.
+INSERT INTO 고객 (고객번호, 이름, 주소) 
+VALUES (3, '홍길동', '강남');
+
+INSERT INTO 극장 (극장번호, 극장이름, 위치) 
+VALUES (1, '롯데', '잠실');
+
+INSERT INTO 상영관 (극장번호, 상영관번호, 영화제목, 가격, 좌석수) 
+VALUES (1, 1, '어려운 영화', 15000, 48);
+
+INSERT INTO 예약 (극장번호, 상영관번호, 고객번호, 좌석번호, 날짜) 
+VALUES (1, 1, 3, 15, TO_DATE('2025-09-01', 'YYYY-MM-DD'));
+
+②영화의 가격을 10%씩 인상하시오
+
+UPDATE 상영관
+SET 가격 = 가격 * 1.1;
+
+문제21
+
+customer1
+orders1
+salesperson
+
+(1)테이블을 생성하는 CREATE 문과 데이터를 삽입하는 INSERT문을 작성하시오. 
+테이블의 데이터 타입은 임의로 정하고, 데이터는 다음 질의의 결과가 나오도록 
+삽입한다.
+
+(2)모든 판매원의 이름과 급여를 보이시오. 단 중복 행은 제거한다.
+select distinct name salary
+from salesperson;
+
+(3)나이가 30세 미만인 판매원의 이름을 보이시오.
+select name
+from salesperson
+where age < 30;
+
+
+(4)‘S’로 끝나는 도시에 사는 고객의 이름을 보이시오.
+select name
+from customer1
+where city like '%S';
+
+
+(5)주문을 한 고객의 수(서로 다른 고객만)를 구하시오.
+select count(distinct custname)
+from orders1;
+
+
+(6)판매원 각각에 대하여 주문의 수를 계산하시오.
+select count(salesperson)
+from orders1
+group by salesperson;
+
+
+(7)‘서울’에 사는 고객으로부터 주문을 받은 판매원의 이름과 나이를 보이시오.(부속
+질의 사용)
+select name, age
+from salesperson
+where name in(
+select salesperson
+from orders1
+where custname in (
+	select name
+	from customer1
+	where city = '서울'
+)
+);
+
+(8)‘서울’에 사는 고객으로부터 주문을 받은 판매원의 이름과 나이를 보이시오.(조인 
+사용)
+select s.name, s.age
+from salesperson s
+where exists (
+select 1
+from orders1 o
+join customer1 c on o.custname = c.name
+where c.city = '서울' and  o.salesperson = s.name
+);
+
+
+(9)두 번 이상 주문을 받은 판매원의 이름을 보이시오.
+select s.name
+from salesperson s
+join orders1 o on o.salesperson = s.name
+group by s.name
+having count(o.salesperson) >= 2;
+
+
+(10)판매원 ‘TOM’의 봉급을 45,000원으로 변경하는 sql문을 작성하시오
+
+update salesperson
+set salary = 45000
+where name = 'TOM';
+
+문제 22
+[기업 프로젝트 데이터베이스]
+
+
+(1)테이블을 생성하는 CREATE문과 데이터를 삽입하는 INSERT문을 작성하시오. 
+테이블의 데이터 타입은 임의로 정하고, 데이터는 다음 질의의 결과가 나오도록 
+삽입한다.
+
+(2)모든 사원의 이름을 보이시오
+select name
+from employee;
+
+(3)여자 사원의 이름을 보이시오
+select name
+from employee
+where sex like '%여%';
+
+(4)팀장(manager)의 이름을 보이시오
+select e.name
+from employee e
+join department d on d.manager = e.empno;
+
+(5)‘IT’부서에서 일하는 사원의 이름과 주소를 보이시오
+select e.name, e.address
+from employee e
+join department d on d.deptno = e.deptno
+where d.deptname = 'IT부서';
+
+
+(6)‘홍길동’ 팀장(manager)부서에서 일하는 사원의 수를 보이시오
+select count(empno)
+from employee
+where deptno = (
+select d.deptno
+from department d
+join employee e on d.manager = e.empno
+where e.name = '홍길동'
+);
+
+(7)사원들이 일한 시간 수를 부서별, 사원 이름별 오름차순으로 보이시오
+select d.deptname, e.name
+from works w
+join employee e on e.empno = w.empno
+join department d on d.deptno = e.deptno
+order by d.deptname, e.name, w.hours_worked asc;
+
+
+(8)2명 이상의 사원이 참여한 프로젝트의 번호, 이름, 사원의 수를 보이시오
+select p.projno, p.projname, count(w.empno)
+from project p
+join works w on w.projno = p.projno
+group by p.projname, p.projno
+having count(w.empno) >= 2;
+
+
+
+(9)3명 이상의 사원이 있는 부서의 사원 이름을 보이시오
+
+select name
+from employee
+where deptno in (
+    select deptno
+    from Employee
+    group by deptno
+    having count(*) >= 3
+);
+
+
+
+
