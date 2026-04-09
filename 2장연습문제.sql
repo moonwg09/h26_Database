@@ -38,21 +38,16 @@ order by c.고객번호;
 
 5) 강남에 있는 모든 극장을 예약한 고객의 이름과 극장번호를 출력하시오
 #나눗셈 (AND 조건/전체 만족): "강남에 있는 극장 A 그리고 극장 B를 둘 다 가본 사람만 손 들어!"
-# 고객번호를 통해서 강남에 있는 모든 극장을 간 사람을 뽑고 and 그 사람의 데이터 중 강남인 것만 뽑아 낸다.
+# 고객번호를 통해서 강남에 있는 모든 극장을 간 고객을 뽑고 and 그 사람의 데이터 중 강남인 것만 뽑아 낸다.
 # 서브쿼리랑 join에 대해서 서브쿼리만 쓸거면 join 없이 가져와도 되지만 각 테이블에 있는 내용을 둘다 출력해야할 때는 join을 써줘야한다.
 
 select c.이름, r.극장번호
 from 고객 c
-join 예약 r on r.고객번호 = c.고객번호
-where c.고객번호 in(
-    SELECT r2.고객번호
-    FROM 예약 r2
-    JOIN 극장 t ON r2.극장번호 = t.극장번호
-    WHERE t.위치 = '강남'
-    GROUP BY r2.고객번호
-    HAVING COUNT(DISTINCT r2.극장번호) = (SELECT COUNT(*) FROM 극장 WHERE 위치 = '강남')
-AND r.극장번호 IN (SELECT 극장번호 FROM 극장 WHERE 위치 = '강남');
+join 예약 r on c.극장번호 = r.극장번호
+where c.고객번호 in (
 
+    select 
+)
 
 (문제4)
 1) 극장 테이블에서 극장 이름, 위치를 추출하시오
