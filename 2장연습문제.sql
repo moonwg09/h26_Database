@@ -41,21 +41,54 @@ order by c.고객번호;
 # 고객번호를 통해서 강남에 있는 모든 극장을 간 고객을 뽑고 and 그 사람의 데이터 중 강남인 것만 뽑아 낸다.
 # 서브쿼리랑 join에 대해서 서브쿼리만 쓸거면 join 없이 가져와도 되지만 각 테이블에 있는 내용을 둘다 출력해야할 때는 join을 써줘야한다.
 
-select c.이름, r.극장번호
+select c.이름, t.극장번호
 from 고객 c
-join 예약 r on c.극장번호 = r.극장번호
 where c.고객번호 in (
-
-    select 
+    select r.고객번호
+    from 예약 r
+    join 극장 t on t.극장번호 = r.극장번호
+    where t.위치 = '강남'
+    group by r.고객번호
+    having count(distinct t.극장번호) = (
+        select t.극장번호
+        from 극장 t
+        where t.위치 = '강남'
+    )
 )
+
 
 (문제4)
 1) 극장 테이블에서 극장 이름, 위치를 추출하시오
-2) 영화 가격이 10000원 이하인 영화 제목을 추출하시오
-3) 고객 테이블에서 이름, 주소를 추출하시오
-4) 극장 위치가 강남인 곳에서 상영 중인 영화제목을 추출하시오
-5)강남에 위치한 극장을 모두 예약한 고객 이름을 출력하시오
+select 이름, 위치
+from 극장;
 
+2) 영화 가격이 10000원 이하인 영화 제목을 추출하시오
+select 영화제목
+from 상영관
+where 가격 <= 10000;
+
+3) 고객 테이블에서 이름, 주소를 추출하시오
+select 이름, 주소
+from 고객;
+
+4) 극장 위치가 강남인 곳에서 상영 중인 영화제목을 추출하시오
+select s.영화제목
+from 상영관 s
+join 극장 t on t.극장번호 = s.극장번호
+where t.위치 = '강남'
+
+5)강남에 위치한 극장을 모두 예약한 고객 이름을 출력하시오
+select 이름
+from 고객 c
+join 예약 r on r.고객번호 = c.고객번호
+join 극장 t on t.극장번호 = r.극장번호
+where t.위치 = '강남'
+group by r.고객번호
+having count(distinct r.극장번호) = (
+    select count(*)
+    from 극장
+    where 극장.위치 = '강남'
+);
 
 연습문제 17번
 
